@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Scientific Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 15px;
+        }
+
+        .calculator {
+            background-color: #1e1e1e;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2d2d2d;
+        }
+
+        .display {
+            background-color: #000000;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: right;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .display .history {
+            color: #888888;
+            font-size: 0.95rem;
+            min-height: 24px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .display .input-output {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-top: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .modes {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #00adb5;
+            padding: 0 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            padding: 18px 5px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            touch-action: manipulation;
+        }
+
+        /* Color Coding for Buttons */
+        button.sci {
+            background-color: #252525;
+            color: #00adb5;
+            font-size: 0.95rem;
+        }
+
+        button.num {
+            background-color: #3a3a3a;
+        }
+
+        button.op {
+            background-color: #ff9f0a;
+            color: #ffffff;
+            font-size: 1.3rem;
+        }
+
+        button.util {
+            background-color: #a5a5a5;
+            color: #000000;
+        }
+
+        button.equals {
+            background-color: #00adb5;
+            color: #ffffff;
+        }
+
+        /* Active visual feedback for touch presses */
+        button:active {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 380px) {
+            button {
+                padding: 14px 2px;
+                font-size: 1rem;
+            }
+            button.sci {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="modes">
+            <span id="angle-mode">DEG</span>
+            <span id="inv-mode"></span>
+        </div>
+        
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div class="input-output" id="display-main">0</div>
+        </div>
+
+        <div class="grid">
+            <button class="sci" data-val="rad" id="btn-deg-rad">Rad</button>
+            <button class="sci" data-val="fact">x!</button>
+            <button class="util" data-val="ac">AC</button>
+            <button class="util" data-val="back">⌫</button>
+            <button class="op" data-val="/">÷</button>
+
+            <button class="sci" data-val="Math.sin(">sin</button>
+            <button class="sci" data-val="Math.cos(">cos</button>
+            <button class="sci" data-val="Math.tan(">tan</button>
+            <button class="sci" data-val="Math.LN10*Math.log10(">log</button>
+            <button class="op" data-val="*">×</button>
+
+            <button class="sci" data-val="Math.log(">ln</button>
+            <button class="sci" data-val="Math.PI">π</button>
+            <button class="sci" data-val="Math.E">e</button>
+            <button class="sci" data-val="**2">x²</button>
+            <button class="op" data-val="-">−</button>
+
+            <button class="sci" data-val="Math.sqrt(">√</button>
+            <button class="num" data-val="7">7</button>
+            <button class="num" data-val="8">8</button>
+            <button class="num" data-val="9">9</button>
+            <button class="op" data-val="+">+</button>
+
+            <button class="sci" data-val="**">x<sup>y</sup></button>
+            <button class="num" data-val="4">4</button>
+            <button class="num" data-val="5">5</button>
+            <button class="num" data-val="6">6</button>
+            <button class="sci" data-val="(">(</button>
+
+            <button class="sci" data-val="Math.exp(">e<sup>x</sup></button>
+            <button class="num" data-val="1">1</button>
+            <button class="num" data-val="2">2</button>
+            <button class="num" data-val="3">3</button>
+            <button class="sci" data-val=")">)</button>
+
+            <button class="sci" data-val="pct">%</button>
+            <button class="num" data-val="0">0</button>
+            <button class="num" data-val=".">.</button>
+            <button class="sci" data-val="sign">±</button>
+            <button class="equals" data-val="equal">=</button>
+        </div>
+    </div>
+
+    <script>
+        const displayMain = document.getElementById('display-main');
+        const displayHistory = document.getElementById('history');
+        const angleModeEl = document.getElementById('angle-mode');
+        const btnDegRad = document.getElementById('btn-deg-rad');
+
+        let currentExpression = '';
+        let isDegMode = true;
+
+        // Setup unified event listeners targeting mobile touches explicitly
+        document.querySelectorAll('.grid button').forEach(button => {
+            const handleAction = (e) => {
+                e.preventDefault(); // Blocks double trigger actions on mobile
+                const val = button.getAttribute('data-val');
+                processInput(val);
+            };
+            
+            button.addEventListener('touchstart', handleAction, { passive: false });
+            button.addEventListener('click', handleAction);
+        });
+
+        function processInput(val) {
+            if (val === 'ac') {
+                clearAll();
+            } else if (val === 'back') {
+                backspace();
+            } else if (val === 'rad') {
+                toggleDegRad();
+            } else if (val === 'sign') {
+                toggleSign();
+            } else if (val === 'equal') {
+                calculate();
+            } else if (val === 'fact') {
+                input('calcFact()');
+            } else if (val === 'pct') {
+                input('Math.percentage');
+            } else {
+                input(val);
+            }
+        }
+
+        function input(value) {
+            if (displayMain.innerText === '0' && !isNaN(value) || displayMain.innerText === 'Error') {
+                currentExpression = '';
+            }
+            currentExpression += value;
+            formatDisplay();
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            displayHistory.innerText = '';
+            displayMain.innerText = '0';
+        }
+
+        function backspace() {
+            if (currentExpression.endsWith('Math.sin(') || 
+                currentExpression.endsWith('Math.cos(') || 
+                currentExpression.endsWith('Math.tan(') ||
+                currentExpression.endsWith('Math.log(')) {
+                currentExpression = currentExpression.replace(/Math\.\w+\($/, '');
+            } else if (currentExpression.endsWith('Math.PI') || currentExpression.endsWith('Math.E')) {
+                currentExpression = currentExpression.replace(/Math\.[A-Z]+$/, '');
+            } else {
+                currentExpression = currentExpression.toString().slice(0, -1);
+            }
+            formatDisplay();
+        }
+
+        function toggleDegRad() {
+            isDegMode = !isDegMode;
+            angleModeEl.innerText = isDegMode ? 'DEG' : 'RAD';
+            btnDegRad.innerText = isDegMode ? 'Rad' : 'Deg';
+        }
+
+        function toggleSign() {
+            if(currentExpression) {
+                if(currentExpression.startsWith('-')) {
+                    currentExpression = currentExpression.substring(1);
+                } else {
+                    currentExpression = '-' + currentExpression;
+                }
+                formatDisplay();
+            }
+        }
+
+        function formatDisplay() {
+            if (!currentExpression) {
+                displayMain.innerText = '0';
+                return;
+            }
+
+            let visibleString = currentExpression
+                .replace(/Math\.sin\(/g, 'sin(')
+                .replace(/Math\.cos\(/g, 'cos(')
+                .replace(/Math\.tan\(/g, 'tan(')
+                .replace(/Math\.log\(/g, 'ln(')
+                .replace(/Math\.LN10\*Math\.log10\(/g, 'log(')
+                .replace(/Math\.PI/g, 'π')
+                .replace(/Math\.E/g, 'e')
+                .replace(/Math\.sqrt\(/g, '√(')
+                .replace(/Math\.exp\(/g, 'exp(')
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, '×')
+                .replace(/\//g, '÷')
+                .replace(/calcFact\(\)/g, '!');
+
+            displayMain.innerText = visibleString;
+        }
+
+        function preprocessExpression(expr) {
+            let processed = expr;
+            processed = processed.replace(/Math\.percentage/g, '*0.01');
+
+            if (isDegMode) {
+                processed = processed.replace(/Math\.sin\(/g, 'Math.sin((Math.PI/180)*');
+                processed = processed.replace(/Math\.cos\(/g, 'Math.cos((Math.PI/180)*');
+                processed = processed.replace(/Math\.tan\(/g, 'Math.tan((Math.PI/180)*');
+            }
+
+            if (processed.includes('calcFact()')) {
+                processed = processed.replace(/(\d+)\s*calcFact\(\)/g, (match, p1) => {
+                    return rFactorial(parseInt(p1));
+                });
+            }
+            return processed;
+        }
+
+        function rFactorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = n; i > 1; i--) result *= i;
+            return result;
+        }
+
+        function calculate() {
+            try {
+                if (!currentExpression) return;
+                let evalExpression = preprocessExpression(currentExpression);
+                let result = eval(evalExpression);
+
+                if (result === undefined || isNaN(result)) {
+                    throw new Error();
+                }
+
+                if (result.toString().includes('.') && result.toString().length > 10) {
+                    result = Number(result.toFixed(8));
+                }
+
+                displayHistory.innerText = displayMain.innerText + ' =';
+                displayMain.innerText = result;
+                currentExpression = result.toString();
+            } catch (error) {
+                displayMain.innerText = 'Error';
+                currentExpression = '';
+            }
+        }
+    </script>
+</body>
+</html>
